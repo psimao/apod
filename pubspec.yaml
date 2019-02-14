@@ -26,6 +26,7 @@ flutter:
   assets:
   - assets/
   - assets/icons/
+  - environment.json
   fonts:
   - family: Nasa
     fonts:
