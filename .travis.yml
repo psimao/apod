@@ -17,51 +17,51 @@ jobs:
     script:
     - ./flutter/bin/flutter test
   - stage: build
-    matrix:
-    - env: JOB=APK
-      os: linux
-      language: android
-      jdk: oraclejdk8
-      android:
-        components:
-        - tools
-        - platform-tools
-        - build-tools-28.0.3
-        - android-27
-        - android-28
-        - extra-google-google_play_services
-        - extra-google-android-support
-        - extra-google-m2repository
-        - extra-android-m2repository
-      sudo: false
-      addons:
-        apt:
-          sources:
-          - ubuntu-toolchain
-          packages:
-          - libstdc++6
-          - fonts-droid
-      before_script:
-      - git clone https://github.com/flutter/flutter.git
-      - sudo apt-get install jq
-      - jq -c ".nasa_api_key = \"${NASA_API_KEY}\"" environment.json > environment.json.temp && mv environment.json.temp environment.json
-      script:
-      - ./flutter/bin/flutter -v build apk
-    - env: JOB=IPA
-      os: osx
-      language: generic
-      osx_image: xcode10.1
-      before_script:
-      - pip2 install six
-      - brew update
-      - brew install --HEAD libimobiledevice
-      - brew install ideviceinstaller
-      - brew install ios-deploy
-      - git clone https://github.com/flutter/flutter.git
-      - brew install jq
-      - jq -c ".nasa_api_key = \"${NASA_API_KEY}\"" environment.json > environment.json.temp && mv environment.json.temp environment.json
-      script:
-      - ./flutter/bin/flutter -v build ios --no-codesign
+    env: JOB=APK
+    os: linux
+    language: android
+    jdk: oraclejdk8
+    android:
+      components:
+      - tools
+      - platform-tools
+      - build-tools-28.0.3
+      - android-27
+      - android-28
+      - extra-google-google_play_services
+      - extra-google-android-support
+      - extra-google-m2repository
+      - extra-android-m2repository
+    sudo: false
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain
+        packages:
+        - libstdc++6
+        - fonts-droid
+    before_script:
+    - git clone https://github.com/flutter/flutter.git
+    - sudo apt-get install jq
+    - jq -c ".nasa_api_key = \"${NASA_API_KEY}\"" environment.json > environment.json.temp && mv environment.json.temp environment.json
+    script:
+    - ./flutter/bin/flutter -v build apk
+  - stage: build
+    env: JOB=IPA
+    os: osx
+    language: generic
+    osx_image: xcode10.1
+    before_script:
+    - pip2 install six
+    - brew update
+    - brew install --HEAD libimobiledevice
+    - brew install ideviceinstaller
+    - brew install ios-deploy
+    - git clone https://github.com/flutter/flutter.git
+    - brew install jq
+    - jq -c ".nasa_api_key = \"${NASA_API_KEY}\"" environment.json > environment.json.temp && mv environment.json.temp environment.json
+    script:
+    - ./flutter/bin/flutter -v build ios --no-codesign
 
 cache:
   directories:
