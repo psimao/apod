@@ -1,5 +1,6 @@
 jobs:
   include:
+
   - stage: test
     env: JOB=PR
     os: linux
@@ -16,6 +17,7 @@ jobs:
     - git clone https://github.com/flutter/flutter.git
     script:
     - ./flutter/bin/flutter test
+
   - stage: build
     env: JOB=APK
     os: linux
@@ -46,6 +48,7 @@ jobs:
     - jq -c ".nasa_api_key = \"${NASA_API_KEY}\"" environment.json > environment.json.temp && mv environment.json.temp environment.json
     script:
     - ./flutter/bin/flutter -v build apk
+
   - stage: build
     env: JOB=IPA
     os: osx
@@ -54,7 +57,7 @@ jobs:
     before_script:
     - pip2 install six
     - brew update
-    - brew install --HEAD libimobiledevice
+    - brew install libimobiledevice
     - brew install ideviceinstaller
     - brew install ios-deploy
     - git clone https://github.com/flutter/flutter.git
