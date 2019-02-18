@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:apod/store/store.dart';
+import 'package:apod/presentation/home/home_page.dart';
 
 class Routes {
   Routes._internal();
@@ -7,9 +9,9 @@ class Routes {
   static final apodDetails = "/apodDetails";
 }
 
-final Map<String, WidgetBuilder> appRoutes = {
+Map<String, WidgetBuilder> appRoutes(ApodStore store) => {
   Routes.home: (context) {
-
+    return HomePage(store);
   },
   Routes.apodDetails: (context) {
 

@@ -1,9 +1,15 @@
 import 'package:apod/models/apod.dart';
 
 class LoadApodAction {
-  final DateTime forSpecificDate;
+  final int index;
 
-  LoadApodAction(this.forSpecificDate);
+  LoadApodAction(this.index);
+}
+
+class ApodIsLoadingAction {
+  final DateTime apodDate;
+
+  ApodIsLoadingAction(this.apodDate);
 }
 
 class ApodLoadedAction {
@@ -12,4 +18,15 @@ class ApodLoadedAction {
   ApodLoadedAction(this.apod);
 }
 
-class ApodNotLoadedAction {}
+class ApodNotLoadedAction {
+  final DateTime apodDate;
+  final Exception exception;
+
+  ApodNotLoadedAction(this.apodDate, this.exception);
+}
+
+class OpenApodExplanationForDate {
+  final DateTime date;
+
+  OpenApodExplanationForDate(this.date);
+}

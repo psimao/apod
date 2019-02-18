@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 final appTheme = ThemeData(primaryColor: AppThemeColors.primaryColor);
 
+final apodTitleTextStyle = TextStyle(color: AppThemeColors.textHighlight, fontFamily: "Nasa");
+
 class AppThemeColors {
   AppThemeColors._internal();
 
