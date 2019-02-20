@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:apod/states/apod_state.dart';
+import 'package:apod/redux/states/apod_state.dart';
 
 @immutable
 class AppState {

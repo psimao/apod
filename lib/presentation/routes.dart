@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:apod/store/store.dart';
+import 'package:apod/redux/store/store.dart';
 import 'package:apod/presentation/home/home_page.dart';
 
 class Routes {
@@ -11,7 +11,7 @@ class Routes {
 
 Map<String, WidgetBuilder> appRoutes(ApodStore store) => {
   Routes.home: (context) {
-    return HomePage(store);
+    return HomePage();
   },
   Routes.apodDetails: (context) {
 

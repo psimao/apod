@@ -1,23 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
-import 'package:apod/routes.dart';
-import 'package:apod/presentation/theme.dart';
-import 'package:apod/store/store.dart';
+import 'package:apod/presentation/app.dart';
+import 'package:apod/injector.dart';
+import 'package:apod/modules.dart';
 
-void main() => runApp(ApodApp());
+void main() {
+  _inject();
+  runApp(ApodApp());
+}
 
-class ApodApp extends StatelessWidget {
-
-  @override
-  Widget build(BuildContext context) {
-    final store = ApodStore();
-    return StoreProvider(
-      store: store,
-      child: MaterialApp(
-        title: "APOD - Astronomy Picture of the Day",
-        theme: appTheme,
-        routes: appRoutes(store)
-      ),
-    );
-  }
+void _inject() {
+  injector.inject([
+    DataModule(),
+    DataLocalModule(),
+    DataRemoteModule(),
+    ReduxModule()
+  ]);
 }

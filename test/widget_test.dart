@@ -5,14 +5,15 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/material.dart';
+import 'package:apod/presentation/app.dart';
+import 'package:apod/injector.dart';
+import 'package:apod/modules.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:apod/main.dart';
 
 void main() {
   testWidgets('Open Apod app', (WidgetTester tester) async {
     // Build our app and trigger a frame.
+    _inject();
     await tester.pumpWidget(ApodApp());
 
     /*
@@ -29,4 +30,14 @@ void main() {
     expect(find.text('1'), findsOneWidget);
     */
   });
+}
+
+void _inject() {
+  // To do -> Mocked Injection
+  injector.inject([
+    DataModule(),
+    DataLocalModule(),
+    DataRemoteModule(),
+    ReduxModule()
+  ]);
 }

@@ -18,13 +18,4 @@ class Apod {
       this.mediaType,
       this.title,
       this.url});
-
-  factory Apod.fromJson(Map<String, dynamic> json) => Apod(
-      copyright: json["copyright"],
-      date: json["date"],
-      explanation: json["explanation"],
-      hdurl: json.containsKey("hdurl") ? json["hdurl"] : null,
-      mediaType: json["media_type"],
-      title: json["title"],
-      url: json["url"]);
 }

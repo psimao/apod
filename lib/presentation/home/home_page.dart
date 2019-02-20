@@ -1,27 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:youtube_player/youtube_player.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:apod/store/store.dart';
+import 'package:youtube_player/youtube_player.dart';
+import 'package:apod/redux/states/app_state.dart';
+import 'package:apod/redux/states/apod_state.dart';
+import 'package:apod/redux/actions/apod_actions.dart';
 import 'package:apod/presentation/common/apod_app_bar.dart';
 import 'package:apod/presentation/common/date_picker.dart';
 import 'package:apod/presentation/theme.dart';
-import 'package:apod/states/app_state.dart';
-import 'package:apod/states/apod_state.dart';
-import 'package:apod/models/apod.dart';
-import 'package:apod/presentation/home/home_actions.dart';
+import 'package:apod/data/entity/apod.dart';
 
 class HomePage extends StatelessWidget {
-  final ApodStore _store;
-
-  HomePage(this._store);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: AppThemeColors.background,
         appBar: HomePageAppBar(context),
-        body: HomePageBody(_store));
+        body: HomePageBody());
   }
 }
 
@@ -40,29 +36,25 @@ class HomePageAppBar extends ApodAppBar {
 }
 
 class HomePageBody extends StatelessWidget {
-  final ApodStore _store;
   final _pictureOfTodayIndex = 0;
 
-  HomePageBody(this._store) {
-    _store.dispatch(LoadApodAction(_pictureOfTodayIndex));
-  }
-
   @override
-  Widget build(BuildContext context) => CustomScrollView(
-        slivers: <Widget>[
-          SliverList(
-            delegate: SliverChildListDelegate(
-                [HomePictureOfTheDay(), HomeExploreLabel()]),
-          ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate((context, index) {
-              return HomeApodListRow(index, _store);
-              //final date = _getDateTimeForIndex(index);
-              //return !_reachedDateLimit(date) ? _buildRow(date) : null;
-            }),
-          )
-        ],
-      );
+  Widget build(BuildContext context) {
+    StoreProvider.of<AppState>(context).dispatch(LoadApodAction(_pictureOfTodayIndex));
+    return CustomScrollView(
+      slivers: <Widget>[
+        SliverList(
+          delegate: SliverChildListDelegate(
+              [HomePictureOfTheDay(), HomeExploreLabel()]),
+        ),
+        SliverList(
+          delegate: SliverChildBuilderDelegate((context, index) {
+            return HomeApodListRow(index);
+          }),
+        )
+      ],
+    );
+  }
 }
 
 class HomePictureOfTheDay extends StatelessWidget {
@@ -151,14 +143,13 @@ class HomeExploreLabel extends StatelessWidget {
 
 class HomeApodListRow extends StatelessWidget {
   final int _index;
-  final ApodStore _store;
 
-  HomeApodListRow(this._index, this._store);
+  HomeApodListRow(this._index);
 
   @override
   Widget build(BuildContext context) {
     final realIndex = _index + 1; // First item loaded on header
-    _store.dispatch(LoadApodAction(realIndex));
+    StoreProvider.of<AppState>(context).dispatch(LoadApodAction(realIndex));
     return StoreConnector<AppState, ApodState>(
         converter: (store) => store.state.apods[realIndex],
         builder: (context, apodState) {

@@ -1,4 +1,4 @@
-import 'package:apod/models/apod.dart';
+import 'package:apod/data/entity/apod.dart';
 
 class LoadApodAction {
   final int index;

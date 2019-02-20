@@ -1,6 +1,6 @@
 import 'package:redux/redux.dart';
-import 'package:apod/actions/apod_actions.dart';
-import 'package:apod/states/apod_state.dart';
+import 'package:apod/redux/actions/apod_actions.dart';
+import 'package:apod/redux/states/apod_state.dart';
 
 final apodReducer = combineReducers<List<ApodState>>([
   TypedReducer<List<ApodState>, ApodIsLoadingAction>(_apodLoadingReducer),

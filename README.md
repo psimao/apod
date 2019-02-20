@@ -1,5 +1,7 @@
 # 🌌 APOD
 
+[![Build Status](https://travis-ci.org/psimao/apod.svg?branch=master)](https://travis-ci.org/psimao/apod)
+
 Astronomy Picture of the Day. Data provided by [NASA](https://api.nasa.gov/api.html)
 
 ## Getting Started

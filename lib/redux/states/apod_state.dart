@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:apod/models/apod.dart';
+import 'package:apod/data/entity/apod.dart';
 
 @immutable
 class ApodState {
