@@ -1,5 +1,5 @@
-import 'package:apod/data/entity/apod.dart';
-export 'package:apod/data/entity/apod.dart';
+import 'package:apod/domain/entity/apod.dart';
+export 'package:apod/domain/entity/apod.dart';
 import 'package:apod/data/data_source.dart';
 export 'package:apod/data/data_source.dart';
 

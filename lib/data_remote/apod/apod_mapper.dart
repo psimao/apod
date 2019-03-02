@@ -1,5 +1,5 @@
 import 'package:apod/data/entity_mapper.dart';
-import 'package:apod/data/entity/apod.dart';
+import 'package:apod/domain/entity/apod.dart';
 import 'dart:convert';
 
 class RemoteApodMapper extends EntityMapper<Apod> {

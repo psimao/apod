@@ -1,19 +1,22 @@
-import 'package:apod/data/entity/apod.dart';
-import 'package:apod/data/repository.dart';
+import 'package:apod/domain/entity/apod.dart';
 import 'package:apod/data/data_source/apod_data_source.dart';
+import 'package:apod/domain/repository/apod_repository.dart';
 
-class ApodRepository extends Repository<Apod> {
+class CachedApodRepository implements ApodRepository {
 
   final ApodDataSource remoteDataSource;
   final ApodDataSource localDataSource;
 
-  ApodRepository(this.remoteDataSource, this.localDataSource);
+  CachedApodRepository(this.remoteDataSource, this.localDataSource);
 
+  @override
   Future<Apod> getAstronomyPictureOfTheDay(DateTime date) async {
     var apod = await localDataSource.getAstronomyPictureOfDay(date);
     if (apod == null) {
       apod = await remoteDataSource.getAstronomyPictureOfDay(date);
-      localDataSource.setAstronomyPictureOfDay(date, apod);
+      if (apod != null) {
+        localDataSource.setAstronomyPictureOfDay(date, apod);
+      }
     }
     return apod;
   }

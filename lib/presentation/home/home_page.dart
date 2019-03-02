@@ -1,204 +1,145 @@
+import 'package:apod/domain/actions/navigation_actions.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:youtube_player/youtube_player.dart';
-import 'package:apod/redux/states/app_state.dart';
-import 'package:apod/redux/states/apod_state.dart';
-import 'package:apod/redux/actions/apod_actions.dart';
+import 'package:apod/domain/states/app_state.dart';
+import 'package:apod/domain/states/apod_state.dart';
+import 'package:apod/domain/actions/apod_actions.dart';
 import 'package:apod/presentation/common/apod_app_bar.dart';
 import 'package:apod/presentation/common/date_picker.dart';
 import 'package:apod/presentation/theme.dart';
-import 'package:apod/data/entity/apod.dart';
+import 'package:apod/presentation/home/home_apod_view_model.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class HomePage extends StatelessWidget {
+  final _title = "APOD";
+
+  var _headerHeight = 400.0;
+  final _headerIndex = 0;
+
+  final _labelStyle = apodTitleTextStyle.copyWith(fontSize: 18.0);
+  final _labelPadding = EdgeInsets.only(top: 32.0, bottom: 32.0);
+
+  final _cardPadding = EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0);
+  final _cardElevation = 8.0;
+  final _cardHeight = 96.0;
+
+  final _cardDayTextStyle =
+      TextStyle(color: AppThemeColors.textCard, fontSize: 24.0);
+  final _cardMonthTextStyle =
+      TextStyle(color: AppThemeColors.textCard, fontSize: 14.0);
+
+  final _apodTitleTextStyle =
+      TextStyle(fontWeight: FontWeight.bold, color: Colors.white);
+  final _apodCopyrightTextStyle = TextStyle(color: Colors.white54);
+
+  final _thumbnailWidth = 120.0;
+
+  BuildContext _context;
 
   @override
   Widget build(BuildContext context) {
+    _context = context;
+    _headerHeight = MediaQuery.of(_context).size.height * 0.6;
     return Scaffold(
         backgroundColor: AppThemeColors.background,
-        appBar: HomePageAppBar(context),
-        body: HomePageBody());
+        appBar: _appBar(),
+        body: _body());
   }
-}
 
-class HomePageAppBar extends ApodAppBar {
-  HomePageAppBar(BuildContext context)
-      : super(title: "APOD", actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.calendar_today),
-            onPressed: () {
-              showApodDatePicker(context).then((date) {
-                // Navigate to explanation screen
-              });
-            },
-          )
-        ]);
-}
+  ApodAppBar _appBar() {
+    final actions = <Widget>[_pickDateButton()];
+    return ApodAppBar(title: _title, actions: actions);
+  }
 
-class HomePageBody extends StatelessWidget {
-  final _pictureOfTodayIndex = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    StoreProvider.of<AppState>(context).dispatch(LoadApodAction(_pictureOfTodayIndex));
+  Widget _body() {
+    StoreProvider.of<AppState>(_context)
+        .dispatch(LoadApodAction(_apodDateForIndex(_headerIndex)));
     return CustomScrollView(
       slivers: <Widget>[
         SliverList(
-          delegate: SliverChildListDelegate(
-              [HomePictureOfTheDay(), HomeExploreLabel()]),
+          delegate: SliverChildListDelegate([_header()]),
         ),
         SliverList(
-          delegate: SliverChildBuilderDelegate((context, index) {
-            return HomeApodListRow(index);
-          }),
+          delegate: SliverChildListDelegate([_exploreLabel()]),
+        ),
+        SliverList(
+          delegate: SliverChildBuilderDelegate((context, index) => _row(index)),
         )
       ],
     );
   }
-}
 
-class HomePictureOfTheDay extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) => ConstrainedBox(
-      constraints: BoxConstraints(minHeight: 400.0),
-      child: Container(
-          child: StoreConnector<AppState, ApodState>(
-        converter: (store) => store.state.apods.first,
-        builder: (context, apodState) {
-          if (apodState.isLoading) {
-            return Center(child: CircularProgressIndicator());
-          } else if (apodState.apod != null) {
-            return _buildHeaderColumn(apodState.apod);
-          } else {
-            return Center(child: Text(""));
-          }
-        },
-      )));
-
-  Widget _buildHeaderColumn(Apod apod) => Stack(
-        alignment: Alignment.bottomCenter,
-        children: <Widget>[
-          _buildHeaderMedia(apod),
-          Container(
-            width: double.infinity,
-            child: _buildHeaderInfo(apod),
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Colors.transparent, Colors.black])),
-          )
-        ],
-      );
-
-  Widget _buildHeaderMedia(Apod apod) => Container(
-      height: 400.0,
-      width: double.infinity,
-      child: apod.mediaType == Apod.TYPE_VIDEO
-          ? _buildVideoWidget(apod.url)
-          : Ink.image(
-              image: NetworkImage(apod.url),
-              fit: BoxFit.cover,
-              child: InkWell(onTap: () {
-                // Navigate to explanation page
-              }),
-            ));
-
-  Widget _buildHeaderInfo(Apod apod) => Container(
-      padding: EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Text(apod.title,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  fontSize: 21.0),
-              maxLines: 1),
-          Text("Copyright ${apod.copyright}",
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: Colors.white54),
-              maxLines: 1)
-        ],
-      ));
-
-  Widget _buildVideoWidget(String url) => url.contains("youtube")
-      ? YoutubePlayer(
-          source: url, quality: YoutubeQuality.HD, showThumbnail: true)
-      : Text("Watch the video on: $url",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white));
-}
-
-class HomeExploreLabel extends StatelessWidget {
-  final _labelStyle = apodTitleTextStyle.copyWith(fontSize: 18.0);
-  final _labelPadding = EdgeInsets.only(top: 32.0, bottom: 32.0);
-
-  @override
-  Widget build(BuildContext context) => Padding(
-      child: Center(child: Text("Explore", style: _labelStyle)),
-      padding: _labelPadding);
-}
-
-class HomeApodListRow extends StatelessWidget {
-  final int _index;
-
-  HomeApodListRow(this._index);
-
-  @override
-  Widget build(BuildContext context) {
-    final realIndex = _index + 1; // First item loaded on header
-    StoreProvider.of<AppState>(context).dispatch(LoadApodAction(realIndex));
-    return StoreConnector<AppState, ApodState>(
-        converter: (store) => store.state.apods[realIndex],
-        builder: (context, apodState) {
-          if (apodState.isLoading) {
-            return _buildLoadingRow(apodState.date);
-          } else if (apodState.apod != null) {
-            return _buildRow(apodState.date, apodState.apod);
-          } else {
-            return Container();
-          }
+  Widget _row(int index) {
+    final realIndex = index + 1; // First item loaded on header
+    final date = _apodDateForIndex(realIndex);
+    if (!Apod.isValidApodDate(date)) return null;
+    StoreProvider.of<AppState>(_context).dispatch(LoadApodAction(date));
+    return StoreConnector<AppState, HomeApodViewModel>(
+        converter: (store) =>
+            HomeApodViewModel.create(store, _apodDateForIndex(realIndex)),
+        builder: (context, viewModel) {
+          final content = viewModel.isLoading
+              ? _loadingRow(viewModel)
+              : viewModel.hasError
+                  ? _errorRow(viewModel)
+                  : _contentRow(viewModel);
+          return Card(
+              color: AppThemeColors.cardBackground,
+              margin: _cardPadding,
+              elevation: _cardElevation,
+              clipBehavior: Clip.antiAlias,
+              child: Stack(
+                children: <Widget>[
+                  Container(
+                      height: _cardHeight,
+                      width: double.infinity,
+                      child: content),
+                  Container(
+                      height: _cardHeight,
+                      width: double.infinity,
+                      child: InkWell(onTap: viewModel.openExplanation)),
+                ],
+              ));
         });
   }
 
-  Widget _buildLoadingRow(DateTime date) => Card(
-      color: AppThemeColors.cardBackground,
-      margin: EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-      elevation: 8.0,
-      clipBehavior: Clip.antiAlias,
-      child: Container(
-          height: 96.0,
-          width: double.infinity,
-          child: Row(children: [
-            _buildApodDateLabel(date),
-            Expanded(
-                child: Padding(
-                    padding: EdgeInsets.only(right: 24.0),
-                    child: LinearProgressIndicator()))
-          ])));
+  Widget _loadingRow(HomeApodViewModel viewModel) {
+    return Row(children: [
+      _dateWidget(viewModel.day, viewModel.month),
+      Expanded(child: _loadingWidget())
+    ]);
+  }
 
-  Widget _buildRow(DateTime date, Apod apod) => Card(
-      color: AppThemeColors.cardBackground,
-      margin: EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-      elevation: 8.0,
-      clipBehavior: Clip.antiAlias,
-      child: Container(
-        height: 96.0,
-        width: double.infinity,
-        child: Row(
-          children: [
-            _buildApodDateLabel(date),
-            _buildApodInfoLabel(apod),
-            _buildApodThumbnail(apod)
-          ],
+  Widget _errorRow(HomeApodViewModel viewModel) {
+    return Row(children: [
+      _dateWidget(viewModel.day, viewModel.month),
+      Expanded(
+        child: Padding(
+          padding: EdgeInsets.only(right: 24.0),
+          child: _errorWidget(viewModel.errorMessage),
         ),
-      ));
+      )
+    ]);
+  }
 
-  Widget _buildApodDateLabel(DateTime apodDate) {
-    final month = DateFormat(DateFormat.ABBR_MONTH).format(apodDate);
-    final day = apodDate.day.toString().padLeft(2, "0");
+  Widget _contentRow(HomeApodViewModel viewModel) {
+    return Row(children: [
+      _dateWidget(viewModel.day, viewModel.month),
+      _apodInfoWidget(viewModel),
+      _thumbnailWidget(viewModel)
+    ]);
+  }
+
+  Widget _loadingWidget() => Padding(
+      padding: EdgeInsets.only(left: 24.0, right: 24.0),
+      child: LinearProgressIndicator());
+
+  Widget _errorWidget(String errorMessage) =>
+      Text(errorMessage, style: TextStyle(color: AppThemeColors.text));
+
+  Widget _dateWidget(String day, String month) {
     return Padding(
         padding: EdgeInsets.only(left: 24.0, right: 24.0),
         child: Column(
@@ -206,43 +147,40 @@ class HomeApodListRow extends StatelessWidget {
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(month,
-                style:
-                    TextStyle(color: AppThemeColors.textCard, fontSize: 14.0)),
-            Text(day,
-                style:
-                    TextStyle(color: AppThemeColors.textCard, fontSize: 24.0))
+            Text(day, style: _cardDayTextStyle),
+            Text(month, style: _cardMonthTextStyle)
           ],
         ));
   }
 
-  Widget _buildApodInfoLabel(Apod apod) => Expanded(
+  Widget _apodInfoWidget(HomeApodViewModel viewModel) => Expanded(
           child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Text(apod.title,
+          Text(viewModel.title,
               overflow: TextOverflow.ellipsis,
-              style:
-                  TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+              style: _apodTitleTextStyle,
               maxLines: 1),
-          Text("Copyright ${apod.copyright}",
+          Text(viewModel.copyright,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: Colors.white54),
+              style: _apodCopyrightTextStyle,
               maxLines: 1)
         ],
       ));
 
-  Widget _buildApodThumbnail(Apod apod) => Stack(
+  Widget _thumbnailWidget(HomeApodViewModel viewModel) => Stack(
         children: <Widget>[
           SizedBox(
-            width: 120.0,
+            width: _thumbnailWidth,
             height: double.infinity,
-            child: Image.network(apod.url, fit: BoxFit.cover),
+            child: viewModel.isVideo
+                ? _videoPlaceholderWidget()
+                : _imageWidget(viewModel.url),
           ),
           Container(
-              width: 120.0,
+              width: _thumbnailWidth,
               decoration: BoxDecoration(
                   gradient: LinearGradient(
                       begin: Alignment.centerLeft,
@@ -253,4 +191,111 @@ class HomeApodListRow extends StatelessWidget {
                   ])))
         ],
       );
+
+  Widget _imageWidget(String url) => FadeInImage(
+        image: CachedNetworkImageProvider(url),
+        placeholder: MemoryImage(kTransparentImage),
+        fit: BoxFit.cover,
+      );
+
+  Widget _videoPlaceholderWidget() => Image.asset(
+        "assets/drawables/video_placeholder.png",
+        fit: BoxFit.cover,
+      );
+
+  Widget _videoWidget(String url) => WebView(
+        initialUrl: url,
+        javascriptMode: JavascriptMode.unrestricted,
+        gestureRecognizers: null,
+      );
+
+  Widget _header() => ConstrainedBox(
+      constraints: BoxConstraints(minHeight: _headerHeight),
+      child: Container(
+          child: StoreConnector<AppState, HomeApodViewModel>(
+        converter: (store) =>
+            HomeApodViewModel.create(store, _apodDateForIndex(_headerIndex)),
+        builder: (context, viewModel) {
+          final content = viewModel.isLoading
+              ? Center(child: _loadingWidget())
+              : viewModel.hasError
+                  ? Center(
+                      child: Padding(
+                          padding: EdgeInsets.all(24.0),
+                          child: _errorWidget(viewModel.errorMessage)))
+                  : _headerMedia(viewModel);
+          return Stack(
+            alignment: Alignment.bottomCenter,
+            children: <Widget>[
+              Container(
+                  height: _headerHeight,
+                  width: double.infinity,
+                  child: content),
+              _headerInfoContainer(viewModel.title, viewModel.copyright),
+              Container(
+                  width: double.infinity,
+                  height: _headerHeight,
+                  child: InkWell(onTap: viewModel.openExplanation))
+            ],
+          );
+        },
+      )));
+
+  Widget _headerInfoContainer(String title, String copyright) => Container(
+        width: double.infinity,
+        child: Container(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Text(title,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 21.0),
+                    maxLines: 1),
+                Text(copyright,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: Colors.white54),
+                    maxLines: 1)
+              ],
+            )),
+        decoration: BoxDecoration(
+            gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.transparent, Colors.black])),
+      );
+
+  Widget _headerMedia(HomeApodViewModel viewModel) => viewModel.isVideo
+      ? _videoWidget(viewModel.url)
+      : _imageWidget(viewModel.url);
+
+  Widget _exploreLabel() => Padding(
+      child: Center(child: Text("Explore", style: _labelStyle)),
+      padding: _labelPadding);
+
+  Widget _pickDateButton() {
+    return IconButton(
+      icon: Icon(Icons.calendar_today),
+      onPressed: () {
+        showApodDatePicker(_context).then((date) {
+          StoreProvider.of<AppState>(_context)
+              .dispatch(NavigateToExplanationPageAction(date));
+        }).catchError((e) => print(e.toString()));
+      },
+    );
+  }
+
+  DateTime _apodDateForIndex(int index) {
+    var now = DateTime.now();
+    var easternDiff = 5 + now.timeZoneOffset.inHours;
+    var easternDate = now.subtract(Duration(
+        days: index,
+        hours: easternDiff,
+    ));
+    return DateTime(easternDate.year, easternDate.month, easternDate.day);
+  }
 }

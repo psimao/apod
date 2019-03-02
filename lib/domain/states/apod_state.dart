@@ -1,9 +1,9 @@
 import 'package:meta/meta.dart';
-import 'package:apod/data/entity/apod.dart';
+import 'package:apod/domain/entity/apod.dart';
+export 'package:apod/domain/entity/apod.dart';
 
 @immutable
 class ApodState {
-  static final firstApodDate = DateTime.utc(1995, 6, 16);
 
   DateTime date;
   Apod apod;
@@ -33,6 +33,6 @@ class InvalidApodDateException implements Exception {
 
   InvalidApodDateException(DateTime apodDate) {
     cause = "APOD date (value: $apodDate) "
-        "must be at the same day or after ${ApodState.firstApodDate}";
+        "must be at the same day or after ${Apod.firstApodDate}";
   }
 }

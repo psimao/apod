@@ -1,5 +1,5 @@
 import 'package:apod/data/entity_mapper.dart';
-import 'package:apod/data/entity/apod.dart';
+import 'package:apod/domain/entity/apod.dart';
 import 'dart:convert';
 
 class LocalApodMapper extends EntityMapper<Apod> {
@@ -23,8 +23,9 @@ class LocalApodMapper extends EntityMapper<Apod> {
 
   @override
   T transform<T>(Apod entity) {
-    if (T is String) {
-      return json.encode(_convertToJSON(entity)) as T;
+    if (T == String) {
+      final string =  json.encode(_convertToJSON(entity));
+      return string as T;
     } else
       return null;
   }

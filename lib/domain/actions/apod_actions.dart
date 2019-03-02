@@ -1,9 +1,9 @@
-import 'package:apod/data/entity/apod.dart';
+import 'package:apod/domain/entity/apod.dart';
 
 class LoadApodAction {
-  final int index;
+  final DateTime date;
 
-  LoadApodAction(this.index);
+  LoadApodAction(this.date);
 }
 
 class ApodIsLoadingAction {
@@ -23,10 +23,4 @@ class ApodNotLoadedAction {
   final Exception exception;
 
   ApodNotLoadedAction(this.apodDate, this.exception);
-}
-
-class OpenApodExplanationForDate {
-  final DateTime date;
-
-  OpenApodExplanationForDate(this.date);
 }

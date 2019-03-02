@@ -13,6 +13,7 @@ void _inject() {
     DataModule(),
     DataLocalModule(),
     DataRemoteModule(),
+    PresentationModule(),
     ReduxModule()
   ]);
 }

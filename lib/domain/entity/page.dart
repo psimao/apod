@@ -1,0 +1,4 @@
+enum Page {
+  HOME,
+  EXPLANATION
+}

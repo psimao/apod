@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-final _firstApodDate = DateTime.utc(1995, 6, 16);
+final _firstApodDate = DateTime.utc(1995, 6, 20);
 
 Future<DateTime> showApodDatePicker(BuildContext context) async {
   return showDatePicker(
