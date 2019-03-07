@@ -46,7 +46,7 @@ jobs:
     - git clone https://github.com/flutter/flutter.git
     - sudo apt-get install jq
     - jq -c ".nasa_api_key = \"${NASA_API_KEY}\"" environment.json > environment.json.temp && mv environment.json.temp environment.json
-    - ./flutter config --android-sdk /usr/local/android-sdk
+    - ./flutter/bin/flutter config --android-sdk /usr/local/android-sdk
     script:
     - ./flutter/bin/flutter -v build apk
 
