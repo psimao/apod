@@ -43,8 +43,8 @@ jobs:
         - libstdc++6
         - fonts-droid
     before_script:
-    - export PATH=$PATH:$ANDROID_HOME/tools
-    - export PATH=$PATH:$ANDROID_HOME/platform-tools
+    - export PATH=$PATH:$ANDROID_HOMEtools
+    - export PATH=$PATH:$ANDROID_HOMEplatform-tools
     - echo $PATH
     - git clone https://github.com/flutter/flutter.git
     - sudo apt-get install jq
