@@ -43,10 +43,12 @@ jobs:
         - libstdc++6
         - fonts-droid
     before_script:
+    - ls /usr/local/android-sdk -l
+    - export PATH=$PATH:/usr/local/android-sdk/platform-tools
+    - export PATH=$PATH:/usr/local/android-sdk/tools
     - git clone https://github.com/flutter/flutter.git
     - sudo apt-get install jq
     - jq -c ".nasa_api_key = \"${NASA_API_KEY}\"" environment.json > environment.json.temp && mv environment.json.temp environment.json
-    - cd $ANDROID_HOME & ls -la
     - ./flutter/bin/flutter doctor
     script:
     - ./flutter/bin/flutter -v build apk
