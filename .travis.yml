@@ -46,8 +46,7 @@ jobs:
     - export ANDROID_HOME=/usr/local/android-sdk
     - export PATH=$PATH:$ANDROID_HOME/tools
     - export PATH=$PATH:$ANDROID_HOME/platform-tools
-    - echo $PATH
-    - ls $ANDROID_HOME & ls $ANDROID_HOME/tools & ls $ANDROID_HOME/platform-tools
+    - mkdir $ANDROID_HOME/licenses
     - git clone https://github.com/flutter/flutter.git
     - sudo apt-get install jq
     - jq -c ".nasa_api_key = \"${NASA_API_KEY}\"" environment.json > environment.json.temp && mv environment.json.temp environment.json
