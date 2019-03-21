@@ -14,7 +14,7 @@ jobs:
         - libstdc++6
         - fonts-droid
     before_script:
-    - git clone https://github.com/flutter/flutter.git
+    - git clone -b stable https://github.com/flutter/flutter.git
     script:
     - ./flutter/bin/flutter test
 
@@ -47,10 +47,9 @@ jobs:
     - export PATH=$PATH:$ANDROID_HOME/tools
     - export PATH=$PATH:$ANDROID_HOME/platform-tools
     - mkdir $ANDROID_HOME/licenses
-    - git clone https://github.com/flutter/flutter.git
+    - git clone -b stable https://github.com/flutter/flutter.git
     - sudo apt-get install jq
     - jq -c ".nasa_api_key = \"${NASA_API_KEY}\"" environment.json > environment.json.temp && mv environment.json.temp environment.json
-    - ./flutter/bin/flutter doctor
     script:
     - ./flutter/bin/flutter -v build apk
 
@@ -65,7 +64,7 @@ jobs:
     - brew install libimobiledevice
     - brew install ideviceinstaller
     - brew install ios-deploy
-    - git clone https://github.com/flutter/flutter.git
+    - git clone -b stable https://github.com/flutter/flutter.git
     - brew install jq
     - jq -c ".nasa_api_key = \"${NASA_API_KEY}\"" environment.json > environment.json.temp && mv environment.json.temp environment.json
     script:
